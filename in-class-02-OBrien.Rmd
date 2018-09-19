@@ -38,14 +38,21 @@ The last 24 columns represent hours.
 
 7. Create a new column in the data frame called daily, which is the sum of the rightmost 24 columns. With this column, create a histogram of the values in this column, which are supposed to be daily rainfall values. What is wrong with this picture?
 ```{r}
-rain_new.df <- mutate(rain.df, daily = sum(4:27))
-rain_new.df <- as.numeric(rain_new.df)
-hist(rain_new.df)
+daily <- rain.df %>%
+  select(-1, -2, -3)%>%
+  rowSums()
+  rain<-cbind(rain.df, test)
+  rain
+hist(rain$daily, main = "Daily Rainfall", xlab = "" , ylab = "")
 ```
-This is wrong because it includes the day column. 
+This is wrong because missing is coded as NA. This is not the true rainfall value for that day. 
 
 8. Create a new data frame rain.df.fixed that takes the original and fixes it for the apparent flaw you have discovered. Having done this, produce a new histogram with the corrected data and explain why this is more reasonable.
-
+```{r}
+rain.df.fixed<- rain %>% 
+    mutate(daily = replace(daily, which(daily<0), NA))
+hist(rain.df.fixed$daily,xlab="Inches",main="Adjusted Frequency of Rain per Hour")
+```
 
 ## Part 2
 ### New York City Flights 13
@@ -56,7 +63,7 @@ This is wrong because it includes the day column.
 - `airports` [1397 x 7]. Airport data.
 
 
-```
+```{r}
 library(nycflights13)
 library(dplyr)
 flights
@@ -76,18 +83,39 @@ The `dplyr` package uses verbs to perform data manipulation.
 ### Filtering Rows
 
 1. Filter all flights on your birthday.
+```{r}
+head(flights)
+names(flights)
+flights %>% filter(month == 7, day == 21)
+```
 2. Filter all flights in rows 567 - 589
-
+```{r}
+flights %>% filter(row_number() %in% 567:589)
+```
 
 ### Arranging Rows
 3. Use arrange() to order the data by year, month and day
+```{r}
+flights %>% arrange(year, month, day)
+```
 4. Use desc() to arrange flights by arrival delay.
-
+```{r}
+flights %>% arrange(desc(arr_delay))
+```
 
 ### Select
-5. Select columns containing data information.
+5. Select columns containing date information.
+```{r}
+flights %>% select(year, month, day)
+```
 6. Select columns including only plane information.
+```{r}
+flights %>% select()
+```
 7. Rename tailnum to tail_num
+```{r}
+flights %>% rename(tailnum = "tail_num")
+```
 
 
 ### Mutating Rows
