@@ -45,7 +45,7 @@ rain.df[2,]
 ```
 
 6. Explain what the command below doesby running it on your data and examining the object. (You may find the display functions head() and tail() useful here.) Is it clear now what the last 24 columns represent?
-##
+##The provided code names the first column (year), the second column (month), the third column (day), and the remaining 24 columns in increasing numeric order starting with 0. These last 24 columns represent hours in a day.
 ```{r}
 names(rain.df) <- c("year","month","day",seq(0,23))
 
@@ -58,7 +58,27 @@ tail(rain.df)
 
 
 7. Create a new column in the data frame called daily, which is the sum of the rightmost 24 columns. With this column, create a histogram of the values in this column, which are supposed to be daily rainfall values. What is wrong with this picture?
+
+##Created a new column that contains the sum of the columns that reported hourly rainfall. First, I selected only columns that reported hourly rainfall, then calculated the sums and bound the resulting column to the existing data frame. Then, a histogram was generated, and it showed a very skewed distribution that reported negative levels of rainfall.
+```{r}
+Daily = rain.df %>%
+  select(-1, -2, -3)%>%
+  rowSums()
+rain<-cbind(rain.df, Daily)
+rain
+hist(rain$Daily, xlab ="Time (in hours)" , ylab = "Amount of Rainfall", main="Amount of Rainfall 1960-1980")
+
+```
+
 8. Create a new data frame rain.df.fixed that takes the original and fixes it for the apparent flaw you have discovered. Having done this, produce a new histogram with the corrected data and explain why this is more reasonable.
+
+##The apparent flaw was that there were many values which were negative and should have initially been coded as NAs. To rectify this mistake, we coded all negative values as NAs. The resulting histogram shows values that we would expect from this data frame.
+
+```{r}
+rain.df.fixed<- rain %>% 
+    mutate(Daily = replace(Daily, which(Daily<0), NA))
+hist(rain.df.fixed$Daily,xlab="Inches",main="Adjusted Frequency of Rain per Hour")
+```
 
 ## Part 2
 ### New York City Flights 13
